@@ -122,3 +122,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# My elimination
+Game_Theory.pdf
+game-theory.md
