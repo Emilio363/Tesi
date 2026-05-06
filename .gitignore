@@ -98,7 +98,7 @@ celerybeat-schedule
 
 # Environments
 .env
-.venv
+tesiVenv/
 env/
 venv/
 ENV/
@@ -127,3 +127,8 @@ dmypy.json
 # My elimination
 Game_Theory.pdf
 game-theory.md
+Burks.pdf
+
+conway_life_book.pdf
+
+gente.txt

@@ -1,5 +1,6 @@
 import numpy as np
 from itertools import product
+import csv
 
 
 class Ambient:
@@ -16,6 +17,11 @@ class Ambient:
         self.ndim = ndim
         self.matrix = np.zeros((size,)*ndim, dtype=bool)
         self.oldmat = np.zeros((size,)*ndim, dtype=bool)
+
+    def randomFill(self):
+        allpos = list(product(range(self.size), repeat=self.ndim))
+        for pos in allpos:
+            self.matrix[pos]=np.random.rand()>0.5
 
     def set(self, list):
         """
@@ -54,10 +60,45 @@ class Ambient:
     def __str__(self):
         return self.matrix.__str__() + "\n"
 
-mat = Ambient(2,5)
-mat.set([(_,2) for _ in range(1,4)])
-#mat.set(list(product([1, 2, 3], repeat=2)))
+    def cellData(self, filename = "life_Data.csv"):
+        data = []
+        restrictedPositions = list(product(range(1,self.size-1), repeat=self.ndim))
+        allDir = self._allDirection()
+        with open(filename, "w", newline='') as file:
+
+            csvwriter = csv.writer(file)
+            field = ["new cell"] #creation of the header
+            for dir in allDir:
+                field.append(str(dir))
+            field.append(str((0,0)))
+            csvwriter.writerow(field)
+
+            for pos in restrictedPositions:
+                thisrow = [int(self.matrix[pos])]
+                for dir in allDir:
+                    newpos = tuple(np.sum([dir, pos], axis = 0))
+                    thisrow.append(int(self.oldmat[newpos]))
+                thisrow.append(int(self.oldmat[pos]))
+                data.append(thisrow)
+
+            csvwriter.writerows(data)
+
+"""
+mat = Ambient(2,10)
+mat.set([(2,2), (2,3), (3,2), (3,3)])
+mat.set([(5,5), (5,6), (6,5), (6,6)])
+#mat.set([(_,6) for _ in range(4,9)])
+
 print(mat)
-for i in range(10):
+for i in range(3):
     mat.epoc()
     print(mat)
+"""
+
+mat = Ambient(2,100)
+mat.randomFill()
+#mat.set([(_,2) for _ in range(1,4)])
+#mat.set(list(product([1, 2, 3], repeat=2)))
+mat.epoc()
+mat.epoc()
+mat.cellData()
