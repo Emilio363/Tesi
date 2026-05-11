@@ -42,7 +42,7 @@ model = MyStupidModel()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)  # Move the model to the selected device
 
-criterion = nn.L1Loss() # loss function
+criterion = nn.BCELoss() # loss function
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 train_loss_array = []
 val_loss_array = []
@@ -57,13 +57,15 @@ for epoch in range(num_epochs):
     start = time()
     ## training step
     for grids, labels in dl:
-#        labels = torch.reshape(labels, (-1,1))
+        labels = torch.reshape(labels, (-1,1))
         ## move data to device for optimization. have to be done to work with GPU
         grids = grids.to(device)
         labels = labels.to(device)
 
         ## forward + backprop + loss
         evalLabels = model(grids)
+        evalLabels = evalLabels.flatten()
+        print(str(evalLabels.size()) + " " + str(labels.size()))
         loss = criterion(evalLabels, labels)
 
         # Reset the gradients to zero: otherwise they accumulate!
@@ -77,6 +79,8 @@ for epoch in range(num_epochs):
         train_running_loss += loss.item()
         # classification report
         sample_count += labels.size(0)
+    
+        break
 
     i = len(dl)
     train_loss_array.append(train_running_loss/i)
@@ -84,7 +88,7 @@ for epoch in range(num_epochs):
 
 
     val_running_loss = 0 
-    for grids, labels in df_val:
+    for grids, labels in dl_val:
         grids = grids.to(device)
         labels = labels.to(device)
 
