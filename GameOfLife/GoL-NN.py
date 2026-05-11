@@ -13,10 +13,9 @@ learning_rate = 0.005
 bechSize = 32
 df = pd.read_csv("life_Data.csv", dtype=bool)
 df = df.to_numpy()
+
 # Dividi il database in training e test
-
-
-x = torch.tensor(df[:, 1: ], dtype= torch.float)
+x = torch.tensor(df[:, 1:], dtype= torch.float)
 y = torch.tensor(df[:,0], dtype= torch.float)
 df = torch.utils.data.TensorDataset(x,y)
 dl = torch.utils.data.DataLoader(df, batch_size=bechSize, shuffle = True)
