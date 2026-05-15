@@ -58,14 +58,18 @@ class StupidModel(Module):
         return x.flatten()
 
 class DumbModel(Module):
-    def __init__(self, loss, optimizer = Adam):
+    def __init__(self, loss, learning_rate : float,  optimizer = None):
+        from torch.cuda import is_available
+        
         super(DumbModel, self).__init__()
         self.loss = loss
-        self.optimizer = optimizer
+        self.learning_rate = learning_rate
+        self.device = device("cuda" if is_available() else "cpu")
         self.l0 = Conv1d(in_channels = 1, out_channels=24, kernel_size=3 )
         self.l1 = Linear(24*13,6*13)
         self.l2 = Linear(6*13, 3*3)
         self.l3 = Linear(3*3, 1)
+        self.optimizer = optimizer if optimizer != None else Adam(self.parameters(), lr=self.learning_rate)
 
     def forward(self, x):
         x = self.l0(x)
@@ -79,7 +83,7 @@ class DumbModel(Module):
         x = sigmoid(x) 
         return x.flatten()
     
-    def training(self, train_dl : DataLoader, max_epochs : int, loss = None, optimizer = None) -> Module:
+    def training_routine(self, train_dl : DataLoader, max_epochs : int, loss = None, optimizer = None) -> list[float]:
         loss = loss if loss != None else self.loss
         optimizer = optimizer if optimizer != None else self.optimizer
         train_acc_array = []
@@ -87,24 +91,23 @@ class DumbModel(Module):
         for epoch in range(max_epochs):
             train_running_loss = 0.0
             train_acc = 0.0
-            sample_count = 0
 
             self.train()
             start = time()
 
             for grids, labels in tqdm(train_dl, desc=f"Epoch {epoch+1}/{max_epochs}"):
-                grids = grids.to(device)
-                labels = labels.to(device)
+                grids = grids.to(self.device)
+                labels = labels.to(self.device)
 
                 evalLabels = self(grids)
-                loss = loss(evalLabels, labels)
+                loss_eval = loss(evalLabels, labels)
 
                 optimizer.zero_grad()
 
-                loss.backward()
+                loss_eval.backward()
                 optimizer.step()
 
-                train_running_loss += loss.item()
+                train_running_loss += loss_eval.item()
                 train_acc += BCEAccuracy(evalLabels, labels)
             
 
@@ -114,6 +117,5 @@ class DumbModel(Module):
             self.eval()
         
             print(f"Epoch: {epoch+1} | Train: {train_running_loss / i:.4f} | Time: {time()-start:.2f}")
-            state = self.state_dict()
-    
-        return state, train_loss_array, train_acc_array
+            
+        return train_loss_array, train_acc_array
