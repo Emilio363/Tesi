@@ -1,0 +1,21 @@
+
+CA: Cellular Automata
+CML: Coupled Map Lattice
+
+Graph Attention Network
+CBAM: Convolutional Block Attention Module
+Coupled Map Lattice
+
+un primo passaggio viene fatto applicando un filtro al vettore delle informazioni, che evidenzia alcuni aspetti rilevanti del vettore. qui abbiamo un passaggio che non modifica le dimensioni delle informazioni della cella e neanche della matrice.
+A questo punto andiamo a valutare una funzione su ogni cella e il suo vicinato. In genere la funzione più semplice potrebbe essere concatenare i due vettori di informazioni della cella e di uno dei suo vicini e moltoplicare per un vettore beta di dimensione adeguata in maniera da ottenere uno scalare. questa operazione viene ripetuta con tutti i vicini della cella e anche con se stessa. ottenuti questi pesi, posso valutare il softmax dei valori e moltiplicarli per il relativo vettore. Su questa seconda parte del vettore può essere valutata un altra funzione oppure una NN.
+Commenti:
+invece di avere un solo 
+
+
+altra idea. e se associata alle varie celle potessimo mettere un vettore non interpretabile che deriva dalle informazioni precedenti? tipo una Recursive. In pratica metto associata a una cella un vettore inizialmente nullo che poi viene a
+
+
+paper:
+loro allenano una rete per predirre il funzionamento di un automa cellulare
+https://distill.pub/2020/growing-ca/
+

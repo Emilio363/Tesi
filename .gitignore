@@ -125,6 +125,7 @@ dmypy.json
 
 
 # My elimination
+genetic-algoritms/
 Game_Theory.pdf
 game-theory.md
 Burks.pdf
@@ -133,6 +134,7 @@ conway_life_book.pdf
 
 gente.txt
 
-*.png
 
+*.pdf
+*.png
 *.pth

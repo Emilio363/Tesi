@@ -1,14 +1,12 @@
-print("start")
 import numpy as np
 import matplotlib.pyplot as plt
-from pandas import read_csv
+import pandas as pd
 from time import time
 import memGoL_models as mm
 from tqdm import tqdm
 import os
 
 from sklearn.metrics import confusion_matrix
-print("sklenar import")
 
 from torch import device, load, no_grad
 from torch import save as torch_save
@@ -16,13 +14,17 @@ from torch.cuda import is_available
 
 import torch.nn as nn
 import torch.nn.functional as F
-print("torch import")
 
 # IPERPARAMETER
 num_epochs = 50
 learning_rate = 0.001
 bechSize = 64
-df = read_csv("matrix_evolution_data.csv", dtype=float)
+df = pd.read_csv("matrix_evolution_data.csv", dtype=float)
+
+# Erise trivial data
+#pattern = [0, 0.0, 10] * 6
+#df = df[~df.eq(pattern).all(axis=1)]
+
 df = df.to_numpy()
 
 train_dl, val_dl, test_dl = mm.dlCreator(data = df[:, :-3], label = df[:, -3], bechsize = bechSize)
@@ -34,6 +36,7 @@ conf_matrix = { "TP" : 0 , "FP" : 0 , "TN" : 0 , "FN" : 0}
 device = device("cuda" if is_available() else "cpu")
 loss = nn.BCELoss()
 
+# training or pass
 model = mm.DumbModel(loss, learning_rate).to(device)
 model_path = "DumbModel" + ".pth"
 train = True
@@ -47,7 +50,7 @@ else:
     torch_save(status, model_path)
 
 
-
+# evaluation
 with no_grad():
     val_running_loss = 0
     val_acc = 0
