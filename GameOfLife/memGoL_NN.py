@@ -6,7 +6,7 @@ import memGoL_models as mm
 from tqdm import tqdm
 import os
 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 from torch import device, load, no_grad
 from torch import save as torch_save
@@ -16,9 +16,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # IPERPARAMETER
-num_epochs = 50
+num_epochs = 5
 learning_rate = 0.001
 bechSize = 64
+model_name = "DumbModel"
+models = mm.getModelsDict()
 df = pd.read_csv("matrix_evolution_data.csv", dtype=float)
 
 # Erise trivial data
@@ -37,8 +39,8 @@ device = device("cuda" if is_available() else "cpu")
 loss = nn.BCELoss()
 
 # training or pass
-model = mm.DumbModel(loss, learning_rate).to(device)
-model_path = "DumbModel" + ".pth"
+model = models[model_name](loss, learning_rate).to(device)
+model_path = model_name + ".pth"
 train = True
 if(model_path in os.listdir()):
     model.load_state_dict(load(model_path))
@@ -54,6 +56,7 @@ else:
 with no_grad():
     val_running_loss = 0
     val_acc = 0
+    cm = np.zeros(shape=(2,2))
     for grids, labels in val_dl:
         grids = grids.to(device)
         labels = labels.to(device)
@@ -61,23 +64,26 @@ with no_grad():
         ## forward + backprop + loss
         evalLabels = model(grids)
         loss = model.loss(evalLabels, labels)
-        labels = labels.data.cpu().numpy().ravel()
+        labels = labels.data.cpu().numpy().ravel().astype(bool)
         evalLabels = evalLabels.data.cpu().numpy().ravel()
-        print([evalLabels>0.5])
-        print(labels)
-        print(f"{type(evalLabels)}  {type(labels)}  {evalLabels.shape}  {labels.shape}")
-        cm = confusion_matrix(evalLabels, labels)
+        # print(evalLabels)
+        # print(labels)
+        # print(f"{type(evalLabels[0])}  {type(labels[0])}  {evalLabels.shape}  {labels.shape}")
+        cm += confusion_matrix(evalLabels > 0.5, labels)
         print(cm)
         val_running_loss += loss.item()
-        val_acc += mm.BCEAccuracy(evalLabels, labels)
+        #val_acc += mm.BCEAccuracy(evalLabels, labels)
 
     
 # i = len(val_dl)
 # val_acc_array.append(val_acc / i)
 # val_loss_array.append(val_running_loss/i)
+plt.figure()
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+disp.plot(cmap=plt.cm.Blues)
+plt.savefig('Confusion Matrix.png')
 
-
-
+"""
 plt.figure()
 plt.plot(train_loss_array)
 plt.plot(val_loss_array)
@@ -87,3 +93,4 @@ plt.figure()
 plt.plot(train_acc_array)
 plt.plot(val_acc_array)
 plt.savefig("acc_plot.png")
+"""

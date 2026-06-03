@@ -9,6 +9,16 @@ from torch.nn import Module, Linear, Conv1d
 from torch.nn.functional import relu
 from torch.optim import Adam
 
+def getModelsDict():
+    import inspect
+    import sys
+    return {
+        name: cls
+        for name, cls in inspect.getmembers(sys.modules[__name__], inspect.isclass)
+        if cls.__module__ == __name__
+    }
+    
+
 def BCEAccuracy(logit, target):
     corrects = ((logit.data > 0.5) == target.data).sum() / len(logit.data)
     return corrects.item()
