@@ -1,0 +1,3 @@
+[submodule "CellularAutomata-SIR"]
+	path = CellularAutomata-SIR
+	url = git@github.com:Emilio363/CellularAutomata-SIR.git
