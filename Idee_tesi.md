@@ -19,3 +19,11 @@ paper:
 loro allenano una rete per predirre il funzionamento di un automa cellulare
 https://distill.pub/2020/growing-ca/
 
+# Modelli
+## SIR
+nel modello SIR i resistenti di base non tornano ad essere suscettibili.
+si può provare a introdurre una temperatura nel sistema in maniera che la forza di infezione vari in base al tempo.
+tentare di introdurre la generazione di numeri pseudorandom.
+## Fire Propagation
+in genere andiamo a lavorare con un modello dove le celle rappresentano una macchia di vegetazione. la vegetazione viene incendiata a random o dai vicini. una volta che prende fuoco passa un po' di tempo e brucia diventando prima contagiosa e poi immune essendo bruciata.
+In certi casi la cella può tornare ad essere susciettibile al fuoco dopo un certo tempo.
