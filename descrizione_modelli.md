@@ -7,12 +7,36 @@ Uno dei primi a studiare gli automi cellulari è stato John von Neumann nel 1952
 Questi modelli sono stati studiati particolarmente dall'avvento dei computer, che ci permettono di eseguire delle simulazioni anche con grosse moli di calcoli in tempo molto breve. Questo ha posrtato nel tempo a rendere i modelli interessanti per tutti quelli studi che posso essere affrontati suddividendo un fenomeno in parti, simili tra loro, che si influenzano tra loro con delle leggi note e non dipendenti dal sistema intero, ma soltanto dalle parti vicine.
 
 
+Gli automi cellulari (AC) rappresentano una classe di modelli matematici discreti utilizzati per simulare sistemi complessi in cui il comportamento globale emerge da interazioni locali semplici. In questi modelli, variabili come lo spazio, il tempo e gli stati sono trattati in modo discreto, differenziandosi dai modelli basati su equazioni differenziali continue.
 
+### Cenni storici
+Il concetto di automa cellulare è nato nei primi anni '50 dal lavoro di **John von Neumann**, su suggerimento di **Stanisław Ulam**. Von Neumann era impegnato nella ricerca di un'organizzazione logica capace di permettere l'autoreplicazione meccanica. Inizialmente esplorò un modello "cinematico" (macchine che galleggiano in un ambiente e si assemblano), ma passò al modello cellulare, più astratto e basato su una griglia fissa, per semplificare l'analisi logica e sfruttare il parallelismo computazionale. In questo spazio, von Neumann dimostrò che era possibile costruire automi capaci sia di computazione universale (come una macchina di Turing) sia di costruzione universale.
+
+Negli anni '70, il matematico John Conway rese celebre il campo con il **"Game of Life"**, un automa bidimensionale con regole semplicissime capace di generare strutture emergenti complesse e Turing-complete. Successivamente, negli anni '80, **Stephen Wolfram** fornì una classificazione sistematica degli AC in quattro classi, basata sulla complessità del loro comportamento a lungo termine.
+
+### Base teorica e simbolica
+Un automa cellulare può essere definito formalmente come una quadrupla $A = (G, E, U, f)$:
+
+1.  **Griglia ($G$):** Uno spazio discreto, solitamente una griglia $d$-dimensionale composta da celle identiche.
+2.  **Insieme degli stati ($E$):** Ogni cella può trovarsi in uno tra un numero finito di stati possibili. Spesso viene designato uno stato speciale detto "quiescente" o "blank".
+3.  **Intorno o Vicinato ($U$):** Per ogni cella, definisce l'insieme di celle vicine che influenzano il suo stato futuro. I tipi più comuni sono:
+    *   **Intorno di von Neumann:** Comprende la cella stessa e le quattro celle adiacenti (sopra, sotto, destra, sinistra).
+    *   **Intorno di Moore:** Include anche le quattro celle diagonali, per un totale di otto vicini.
+4.  **Regola di transizione locale ($f$):** Una funzione che determina lo stato di una cella al passo temporale successivo in base allo stato attuale della cella stessa e dei suoi vicini.
+
+**Dinamica e Sincronismo**
+L'evoluzione di un AC avviene su una base temporale discreta e **sincrona** ($t = 0, 1, 2, ...$): tutte le celle aggiornano il proprio stato simultaneamente a ogni iterazione. Simbolicamente, lo stato di una cella $i$ al tempo $t+1$ è espresso come:
+$$\sigma_i(t+1) = f(\{\sigma_j(t) \mid j \in N(i)\})$$
+dove $N(i)$ rappresenta il vicinato della cella $i$. 
+
+Questa struttura permette di modellare una vasta gamma di fenomeni, dalla propagazione di eccitazioni nei tessuti cardiaci alla fluidodinamica (tramite i metodi *Lattice Boltzmann*), fornendo uno strumento che cattura l'essenza della complessità naturale con una minima perdita di informazioni locali.
 
 Questo documento descrive i modelli di automa cellulare implementati nella cartella
 `CellularAutomata-SIR`. I tre modelli principali (SIR, incendio boschivo, Ising) hanno la
 logica di evoluzione scritta in C (cartella `C_file/`, compilata in librerie condivise) e
 vengono pilotati da Python tramite `ctypes`; la visualizzazione è fatta con `pygame`.
+
+## CLaudio
 
 ## Architettura comune
 
