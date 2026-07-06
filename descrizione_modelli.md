@@ -1,42 +1,88 @@
 # Descrizione dei modelli di automa cellulare
 
-Gli automi cellulari sono dei modelli discreti utilizzati per lo studio di molti fenomeni. La carattestica principale di questi modelli è di essere discreta nel tempo, nello spazio e negli stati. Discreto nel tempo vuol dire che lo stato di tutto il modello può essere osservato soltanto in istanti di tempo definiti, quindi non c'è di fatto una continuità nel modello. Discreti nello spazio vuol dire che lo spazio in cui vive il modello è discreto. non avremo quindi uno studio su uno spazio contunuo come potrebbe essere l'area di un recinto, ma suddividiamo il nostro spazio in elementi discreti. Discreto nello stato vuol dire che ogni elemento del nostro modello può assumere soltanto degli stati discreti. 
+Gli automi cellulari (CA) rappresentano una classe di modelli matematici discreti utilizzati per simulare sistemi complessi in cui il comportamento globale emerge da interazioni locali semplici. In questi modelli, variabili come lo spazio, il tempo e gli stati sono trattati in modo discreto, differenziandosi dai modelli basati su equazioni differenziali continue.
 
-Uno dei primi a studiare gli automi cellulari è stato John von Neumann nel 1952 nel contesto dell'auto replicazione. Al tempo veniva distusso se pottesse esistere un sistema che sia capace di creare una copia di se stesso o un altro sistema di simile complessità, senza che venga fornito alcun input esterno. Il sistema doveva quindi avere al suo interno tutte le informazioni su come creare questo altro sistema, che a sua volta doveva essere capace di ricreare il primo. Von Neumann arrivo a descrivere un sistema di 29 stati capace di auto replicarsi.
+Il concetto di automa cellulare è nato nei primi anni '50 dal lavoro di John von Neumann che era impegnato nella ricerca di un'organizzazione logica capace di creare delle strutture autoreplicanti. Studiò un modello cellulare, basato su una griglia fissa, per semplificare l'analisi logica e sfruttare il parallelismo computazionale. In questo spazio, von Neumann dimostrò che era possibile costruire automi capaci sia di computazione universale (come una macchina di Turing) sia di costruzione universale.
 
-Questi modelli sono stati studiati particolarmente dall'avvento dei computer, che ci permettono di eseguire delle simulazioni anche con grosse moli di calcoli in tempo molto breve. Questo ha posrtato nel tempo a rendere i modelli interessanti per tutti quelli studi che posso essere affrontati suddividendo un fenomeno in parti, simili tra loro, che si influenzano tra loro con delle leggi note e non dipendenti dal sistema intero, ma soltanto dalle parti vicine.
+Negli anni '70, il matematico John Conway rese celebre il campo con il "Game of Life", un automa bidimensionale con regole semplicissime capace di generare strutture emergenti complesse e Turing-complete. Successivamente, negli anni '80, Stephen Wolfram fornì una classificazione sistematica degli CA in quattro classi, basata sulla complessità del loro comportamento a lungo termine.
 
+<!-- volendo si può espandere con la classificazione di wolfram e le regole di GoL -->
 
-Gli automi cellulari (AC) rappresentano una classe di modelli matematici discreti utilizzati per simulare sistemi complessi in cui il comportamento globale emerge da interazioni locali semplici. In questi modelli, variabili come lo spazio, il tempo e gli stati sono trattati in modo discreto, differenziandosi dai modelli basati su equazioni differenziali continue.
+## Base teorica
 
-### Cenni storici
-Il concetto di automa cellulare è nato nei primi anni '50 dal lavoro di **John von Neumann**, su suggerimento di **Stanisław Ulam**. Von Neumann era impegnato nella ricerca di un'organizzazione logica capace di permettere l'autoreplicazione meccanica. Inizialmente esplorò un modello "cinematico" (macchine che galleggiano in un ambiente e si assemblano), ma passò al modello cellulare, più astratto e basato su una griglia fissa, per semplificare l'analisi logica e sfruttare il parallelismo computazionale. In questo spazio, von Neumann dimostrò che era possibile costruire automi capaci sia di computazione universale (come una macchina di Turing) sia di costruzione universale.
-
-Negli anni '70, il matematico John Conway rese celebre il campo con il **"Game of Life"**, un automa bidimensionale con regole semplicissime capace di generare strutture emergenti complesse e Turing-complete. Successivamente, negli anni '80, **Stephen Wolfram** fornì una classificazione sistematica degli AC in quattro classi, basata sulla complessità del loro comportamento a lungo termine.
-
-### Base teorica e simbolica
 Un automa cellulare può essere definito formalmente come una quadrupla $A = (G, E, U, f)$:
 
-1.  **Griglia ($G$):** Uno spazio discreto, solitamente una griglia $d$-dimensionale composta da celle identiche.
-2.  **Insieme degli stati ($E$):** Ogni cella può trovarsi in uno tra un numero finito di stati possibili. Spesso viene designato uno stato speciale detto "quiescente" o "blank".
-3.  **Intorno o Vicinato ($U$):** Per ogni cella, definisce l'insieme di celle vicine che influenzano il suo stato futuro. I tipi più comuni sono:
-    *   **Intorno di von Neumann:** Comprende la cella stessa e le quattro celle adiacenti (sopra, sotto, destra, sinistra).
-    *   **Intorno di Moore:** Include anche le quattro celle diagonali, per un totale di otto vicini.
+1.  **$G$ (Griglia) :** Uno spazio discreto, solitamente una griglia $d$-dimensionale composta da celle identiche.
+2.  **$E$ (Insieme degli stati):** Ogni cella può trovarsi in uno tra un numero finito di stati possibili.
+3.  **$U$ (Vicinato):** Per ogni cella, definisce l'insieme di celle vicine che influenzano il suo stato futuro.
 4.  **Regola di transizione locale ($f$):** Una funzione che determina lo stato di una cella al passo temporale successivo in base allo stato attuale della cella stessa e dei suoi vicini.
 
-**Dinamica e Sincronismo**
-L'evoluzione di un AC avviene su una base temporale discreta e **sincrona** ($t = 0, 1, 2, ...$): tutte le celle aggiornano il proprio stato simultaneamente a ogni iterazione. Simbolicamente, lo stato di una cella $i$ al tempo $t+1$ è espresso come:
-$$\sigma_i(t+1) = f(\{\sigma_j(t) \mid j \in N(i)\})$$
-dove $N(i)$ rappresenta il vicinato della cella $i$. 
+L'evoluzione di un CA avviene su una base temporale discreta e sincrona, quindi tutte le celle aggiornano il proprio stato simultaneamente a ogni iterazione.
+
+Si indichi con $i$ una cella di un CA; lo stato della cella $i$ al tempo $t$ viene indicato con $\sigma_i(t)$. Possiamo quindi in generale definire la regola di update dello stato di una cella come:
+$$\sigma_i(t+1) = f(\{\sigma_j(t) \mid j \in U(i)\})$$
+dove $U(i)$ rappresenta il vicinato della cella $i$. 
 
 Questa struttura permette di modellare una vasta gamma di fenomeni, dalla propagazione di eccitazioni nei tessuti cardiaci alla fluidodinamica (tramite i metodi *Lattice Boltzmann*), fornendo uno strumento che cattura l'essenza della complessità naturale con una minima perdita di informazioni locali.
+
+In questa tesi, sono stati analizzati automi cellulari strutturati con $G = \Z^2$, la griglia quadrata in 2 dimensioni. Come vicinato sono stati utilizzati di raggio 1 di:
+
+- **Von Neumann**: consiste nelle celle distanti 1, nella distanza di manhattan, dalla cella interessata. Quindi nel caso di studio avremo 4 vicini per ogni cella.
+
+  |   |   |   |
+  |:-:|:-:|:-:|
+  |   | ■ |   |
+  | ■ | **C** | ■ |
+  |   | ■ |   |
+
+- **Moore**: consiste nelle celle distanti 1, nella distanza di Chebyshev, dalla cella interessata. Quindi nel caso di studio avremo 8 vicini per ogni cella.
+
+  |   |   |   |
+  |:-:|:-:|:-:|
+  | ■ | ■ | ■ |
+  | ■ | **C** | ■ |
+  | ■ | ■ | ■ |
+
+In questa tesi i modelli sono modellizati sia come finiti che come infiniti.
+Nei modelli finiti, il vicinato delle celle che stanno ai bordi e a gli angoli della griglia non comprendono soltanto le celle interne alla griglia. Ad esempio il vicinato di Moore della cella nell'angolo in basso a destra comprende soltanto le celle:
+
+|   |   |   |   |   |   |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   | ■ | ■ |
+|   |   |   |   | ■ | **C** |
+
+Nei modelli infiniti, siccome non possiamo simulare una struttura infinita per definizione di CA, viene approssimata l'infinitezza del modello definendo il vicinato come se la griglia vivesse in un toro. In questa maniera il vicinato della stessa cella dell'esempio precedente comprende anche le celle sui bordi opposti della griglia, incluse quelle negli angoli in alto a destra, in basso a sinistra e in alto a sinistra:
+
+|   |   |   |   |   |   |
+|-|-|:-:|:-:|:-:|:-:|
+| ■ |   |   |   | ■ | ■ |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| ■ |   |   |   | ■ | ■ |
+| ■ |   |   |   | ■ | **C** |
+
+## Modelli studiati
+
+Data l'ampia gamma di problemi che posso essere studiati tramite gli Automi Cellulari, si è scelto di restingere il campo a tre modelli differenti per numero di stati e legge di aggiornamento.
+
+### Modello SIR per la propagazione di malattie
+
+### Modello di diffusione degli incendi
+
+### Modello di Ising per la magnetizzazione 
+
+## Implementazione
 
 Questo documento descrive i modelli di automa cellulare implementati nella cartella
 `CellularAutomata-SIR`. I tre modelli principali (SIR, incendio boschivo, Ising) hanno la
 logica di evoluzione scritta in C (cartella `C_file/`, compilata in librerie condivise) e
 vengono pilotati da Python tramite `ctypes`; la visualizzazione è fatta con `pygame`.
 
-## CLaudio
 
 ## Architettura comune
 
