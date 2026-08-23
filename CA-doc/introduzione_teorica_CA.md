@@ -2,28 +2,127 @@
 
 ## Introduzione generale ai CA
 
-Il concetto di automa cellulare nasce nei primi anni '50 dal lavoro di John von Neumann, allora alla ricerca di un'organizzazione logica capace di generare strutture autoreplicanti: uno spazio cellulare discreto, con regole locali identiche per ogni cella, permette di isolare l'essenza logica del problema e di sfruttare il parallelismo computazionale. Su questa griglia von Neumann dimostrò che è possibile costruire automi capaci sia di *computazione universale* (equivalenti a una macchina di Turing) sia di *costruzione universale* (in grado, cioè, di autoreplicarsi). Negli anni '70 John Conway rende celebre il campo con il "Game of Life", un automa bidimensionale a regole minime, Turing-completo, capace di generare comportamento complesso ed emergente; negli anni '80 Stephen Wolfram propone una classificazione sistematica degli automi cellulari in quattro classi di comportamento asintotico, basata sulla complessità a lungo termine della dinamica.
+Il concetto di automa cellulare nasce nei primi anni '50 dal lavoro di John von Neumann, allora alla ricerca di un'organizzazione logica capace di generare strutture autoreplicanti. Uno spazio cellulare discreto, con regole locali identiche per ogni cella, permette di isolare l'essenza logica del problema e di sfruttare il parallelismo computazionale. Su una griglia von Neumann dimostrò che è possibile costruire automi capaci sia di *computazione universale* (equivalenti a una macchina di Turing) sia di *costruzione universale* (in grado, cioè, di autoreplicarsi). Negli anni '70 John Conway rende celebre il campo con il "Game of Life", un automa bidimensionale a regole minime, Turing-completo, capace di generare comportamento complesso ed emergente; negli anni '80 Stephen Wolfram propone una classificazione sistematica degli automi cellulari in quattro classi di comportamento asintotico, basata sulla complessità a lungo termine della dinamica.
 
-Un automa cellulare è un sistema definito dalla quadrupla $(C, Q, V, f)$ [[3]](CA-doc/SIR/A%20Model%20Based%20on%20Cellular%20Automata%20to%20Simulate%20Epidemic%20Diseases.pdf):
+Un automa cellulare (CA, *Cellular Automata*) è un sistema dinamico discreto in spazio, tempo e stati. Gli stati sono trattati come grandezze discrete, a differenza dei modelli basati su equazioni differenziali continue. È costituito da un numero finito di oggetti identici, chiamati *celle*, disposte in uno *spazio cellulare*; ogni cella è dotata di uno *stato* (elemento di un insieme finito) che evolve a passi discreti nel tempo secondo una *regola di transizione locale*, identica per ogni cella e applicata simultaneamente a tutta la griglia. Lo stato di una cella al istante $t$ dipende dagli stati delle celle del suo *vicinato* all'istante precedente $t-1$. Formalmente un automa cellulare è un sistema definito dalla quadrupla $(C, Q, V, f)$ [[3]](CA-doc/SIR/A%20Model%20Based%20on%20Cellular%20Automata%20to%20Simulate%20Epidemic%20Diseases.pdf):
 
-- $C$ **spazio cellulare** $ = \{(i,j) : 1 \le i \le r,\; 1 \le j \le c\}$;
-- $Q$ **insieme degli stati** finito ;
-- **vicinato** $V = \{(\alpha_k, \beta_k) : 1 \le k \le n\} \subset \mathbb{Z} \times \mathbb{Z}$, cioè l'insieme di indici che definisce, per la cella $(i,j)$, l'insieme di celle
+1.  **$C$ Spazio cellulare :** Uno spazio discreto, solitamente una griglia $d$-dimensionale composta da celle identiche.
+2.  **$Q$ Insieme degli stati:** Ogni cella può trovarsi in uno tra un numero finito di stati possibili.
+3.  **$V$ Vicinato:** Per ogni cella, definisce l'insieme di celle vicine che influenzano il suo stato futuro.
+4.  **$f$ Regola di transizione locale:** Una funzione che determina lo stato di una cella al passo temporale successivo in base allo stato attuale della cella stessa e dei suoi vicini.
+
+Si indichi con $i$ una cella di un CA; lo stato della cella $i$ al tempo $t$ viene indicato con $\sigma_i(t)$. Possiamo quindi in generale definire la regola di update dello stato di una cella come:
+$$\sigma_i(t+1) = f(\{\sigma_j(t) \mid j \in U(i)\})$$
+dove $U(i)$ rappresenta il vicinato della cella $i$. 
+
+Questa struttura permette di modellare una vasta gamma di fenomeni, dalla propagazione di eccitazioni nei tessuti cardiaci alla fluidodinamica (tramite i metodi *Lattice Boltzmann*), fornendo uno strumento che cattura l'essenza della complessità naturale con una minima perdita di informazioni locali.
+
+### Automi Cellulari 2-dimensionali
+
+Per gli scopi di questa tesi sono stati studiati gli automi cellulari a 2-dimensioni su griglia. In questo caso la definizione dell'automa diventa più rigida:
+
+- $C = \{(\alpha,\beta) \in \mathbb{Z}^2 : 1 \le \alpha \le r, 1 \le \beta \le c\}$ è la griglia (o spazio cellulare), un reticolo finito di $r \times c$ celle
+- $Q$ è l'insieme finito degli stati, a questo viene associata una funzione $\sigma: S \times N \rightarrow Q$ che ad ogni cella in un determinato istante di tempo associa un certo stato
+- $V = \{(i_k, j_k) : 1 \le k \le n\} \subset \mathbb{Z} \times \mathbb{Z}$, dove $n$ è il numero di vicini di ogni cella. $V$ è un insieme di coordinate relative, dove ogni valore può essere sia positivo che negativo. In questa maniera viene definito un vicinato che ha una forma uguale e centrata sulla cella della quale si vuole conoscere il vicinato:
 $$
-\{(i+\alpha_1, j+\beta_1),\, \dots,\, (i+\alpha_n, j+\beta_n)\};
+V_{\alpha, \beta} = \{(\alpha+i_k, \beta+j_k)\; |\;\forall\; (i_k, j_k) \in V \};
 $$
-- **funzione di transizione locale** $f$:
+- $f : Q^n \to Q$ è la funzione di transizione locale, identica per ogni cella. Indichiamo con $s_{\alpha\beta}^{\,t}$ lo stato della cella $(\alpha,\beta)$ al istante $t$: 
 $$
-s_{ij}^{\,t} = f\!\left(s_{i+\alpha_1,\,j+\beta_1}^{\,t-1},\, \dots,\, s_{i+\alpha_n,\,j+\beta_n}^{\,t-1}\right) \in Q,
-$$
-dove $s_{ij}^{\,t}$ è lo stato della cella $(i,j)$ al tempo $t$.
+s_{\alpha\beta}^{t+1} = f\left(V_{\alpha, \beta}\right) \in Q$$
 
-Un automa cellulare (CA, *Cellular Automata*) è un sistema dinamico discreto in spazio, tempo e stati. Gli stati sono trattati come grandezze discrete, a differenza dei modelli basati su equazioni differenziali continue. È costituito da un numero finito di oggetti identici, chiamati *celle*, disposte in modo regolare in uno *spazio cellulare*; ogni cella è dotata di uno *stato* (elemento di un insieme finito) che evolve a passi discreti di tempo secondo una *regola di transizione locale*, identica per ogni cella e applicata simultaneamente a tutta la griglia. Lo stato di una cella al tempo $t$ dipende dagli stati delle celle del suo *vicinato* al tempo precedente $t-1$ [[3]](CA-doc/SIR/A%20Model%20Based%20on%20Cellular%20Automata%20to%20Simulate%20Epidemic%20Diseases.pdf).
+### Condizioni ai limiti della griglia
+
+Quando si simula o si analizza un automa cellulare su un computer, ci si scontra inevitabilmente con il limite fisico della finitudine della griglia. Le celle situate lungo i bordi (o la periferia) dello spazio non possiedono lo stesso numero di vicini rispetto alle celle posizionate al centro. Per risolvere questa asimmetria e stabilire come debbano comportarsi le celle di confine, si applicano le condizioni al contorno (o condizioni al limite).
+Poiché $C$ è finito, la definizione del vicinato di $(\alpha,\beta)$ non sempre è ben determinata. Infatti si potrebbe incontare dei punti che eccedono la griglia prefissata $(\alpha,\beta)+(i_k,j_k) \notin C$. Ciò richiede di fissare esplicitamente una condizione al contorno.La scelta di queste condizioni influisce profondamente sulla dinamica globale dell'automa e si divide principalmente in due approcci.
+
+#### Condizioni al Contorno Non Periodiche
+
+L'approccio più semplice che possiamo trovare è il troncamento del vicinato. Questo si può intendere in due maniere:
+- **Troncamnento:** le coordinate che non corrispondono a una cella del reticolo, non vengono considerate dalla regola di transizione locale per la cella al centro. Questo costringe però alla non unicità della regola di transizione, dando alle celle al contorno dei comportamenti anomali.
+- **Stato neutro:** per le coordinate che non appartengono alla griglia, si assume uno stato di default. Questo permette di mantenere una regola di transizione uguale per tutte le celle, ma le celle ai bordi avranno un comportamento fortemente influenzato dallo stato di default, dando quindi comunque un comportamento anomalo rispetto alle celle più interne.
+
+|   |   |   |   |   |   |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   | ■ | ■ |
+|   |   |   |   | ■ | **C** |
+
+#### Condizioni al Contorno Periodiche
+
+Molti problemi che possono essere affrontati con un CA richiedono di lavorare su un ambiente infinito, ma per definizione i CA sono finiti. Per approssimare un reticolo infinito si usano dei viciniati periodici che permettono di mantenere la finitezza del modello. Questo risultato si ottiene connettendo idealmente i bordi opposti della griglia in modo che non vi sia alcuna interruzione spaziale. Rappresentando graficamente quello che avvine in una griglia 2D, si può immaginare di unire il bordo destro e sinistro (ottenendo un cilindro) e poi unendo il bordo superiore ed inferiore. In questa maniera possiamo vedere come il modello adesso sia diventato un toroide.
+
+Così facendo si ottiene che tutti i nodi risultano equivalenti dal punto di vista della dimensione del vicinato, ed ogni cella del vicinato è mutevole nello stato. Inoltre abbiamo un essenziale passaggio di informazione tra i vari limiti del modello
+
+|   |   |   |   |   |   |
+|-|-|:-:|:-:|:-:|:-:|
+| ■ |   |   |   | ■ | ■ |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| ■ |   |   |   | ■ | ■ |
+| ■ |   |   |   | ■ | **C** |
+
+### Tipi di vicinato
+
+Un fattore fondamentale nello sviluppo degli automi cellulari è il vicinato. questo infatti determina quali celle influenzino la cella che si sta osservando. Un vicinato più ampio fa in modo che la cella ottenda più informazioni dal contesto e quindi osserveremo maggiormente effetti macroscopici. Riducendo il vicinato invece accentueremo l'emergenza di fenomeni locali.
+
+Le due geometrie base per gli intorni, parametrizzate da un raggio di influenza $r \ge 1$, sono definite matematicamente in $\mathbb{Z}^d$. Quando queste definizioni generali vengono proiettate su una griglia bidimensionale classica di celle quadrate $d=2$ con raggio unitario $r = 1$, si ottengono le forme geometriche standard più utilizzate nelle simulazioni.
+
+#### Intorno di Moore
+
+Raccoglie tutte le celle $y$ la cui distanza dalla cella centrale $c$, misurata tramite la norma dell'infinito (o norma di Chebyshev, $\|\cdot\|_\infty$), è inferiore o uguale a $r$:
+
+$$V_c = \{y \in \mathbb{Z}^d : \|y - c\|_\infty \le r\}$$
+
+Questa norma definisce la distanza massima lungo una singola coordinata cartesiana. Geometricamente, l'intorno risultante forma un ipercubo $d$-dimensionale centrato in $c$ che include tutte le celle adiacenti sia per lato sia diagonalmente.
+
+Passando alle 2 dimensioni, possiamo esprimere $c= (\alpha, \beta)$ ed $y = (i,j).$
+Applicando la definizione con la norma $\|\cdot\|_\infty \le 1$, la condizione di adiacenza si traduce nel controllo simultaneo sulle due dimensioni:
+
+$$|\alpha - i| \le 1 \quad \text{e} \quad |\beta - j| \le 1$$
+
+Questo intorno racchiude la cella centrale, i quattro vicini cardinali e i quattro vicini diagonali, per un totale di 9 celle:
+
+$$V_{\alpha, \beta} = \{s_{\alpha, \beta}, s_{\alpha-1, \beta}, s_{\alpha-1, \beta-1}, s_{\alpha, \beta-1}, s_{\alpha+1, \beta-1}, s_{\alpha+1, \beta}, s_{\alpha+1, \beta+1}, s_{\alpha, \beta+1}, s_{\alpha-1, \beta+1}\}$$
+
+Geometricamente, l'intorno corrisponde a un quadrato compatto di $3 \times 3$ celle incentrato sulla cella da aggiornare.
+
+  |   |   |   |
+  |:-:|:-:|:-:|
+  | ■ | ■ | ■ |
+  | ■ | **C** | ■ |
+  | ■ | ■ | ■ |
 
 
-I due vicinati più usati sono quello di **von Neumann** (la cella e i suoi 4 vicini ortogonali) e quello di **Moore** (la cella e i suoi 8 vicini più prossimi) [[3]](CA-doc/SIR/A%20Model%20Based%20on%20Cellular%20Automata%20to%20Simulate%20Epidemic%20Diseases.pdf), [[4]](CA-doc/SIR/Modeling%20epidemics%20using%20cellular%20automata.pdf). La dinamica è **discreta sia nel tempo che nello spazio**, e — a differenza delle ODE — permette di specificare *direttamente* effetti locali come vicinato, connettività non omogenea, ostacoli geografici o eterogeneità nella densità di popolazione. Le condizioni al contorno (tipicamente nulle o periodiche) devono essere fissate esplicitamente affinché la dinamica sia ben definita su una griglia finita.
+#### Intorno di von Neumann
 
----
+Raccoglie tutte le celle $y$ la cui distanza dalla cella centrale $c$, misurata tramite la norma $L_1$ (norma di Manhattan, $\|\cdot\|_1$), è inferiore o uguale a $r$: 
+
+$$V_c = \{y \in \mathbb{Z}^d : \|y - c\|_1 \le r\}$$
+
+Questa norma somma le distanze assolute lungo ciascuna coordinata cartesiana. L'intorno risultante forma un iperottaedro (una sorta di rombo multidimensionale) centrato in $c$ che esclude le celle raggiungibili solo muovendosi in diagonale.
+
+Passando alle 2 dimensioni, possiamo esprimere $c= (\alpha, \beta)$ ed $y = (i,j).$
+Applicando la definizione con la norma $\|\cdot\|_1 \le 1$, la condizione di adiacenza diventa:
+
+$$|\alpha -i | + |\beta -j| \le 1$$
+
+Questo intorno comprende la cella centrale stessa e i suoi quattro vicini immediati situati nelle direzioni cardinali (Nord, Sud, Est, Ovest), per un totale di 5 celle:
+
+$$V_{\alpha, \beta} = \{s_{\alpha, \beta}, s_{\alpha-1, \beta}, s_{\alpha, \beta-1}, s_{\alpha+1, \beta}, s_{\alpha, \beta+1}\}$$
+
+Visivamente, questa configurazione disegna una croce simmetrica sulla griglia.
+
+  |   |   |   |
+  |:-:|:-:|:-:|
+  |   | ■ |   |
+  | ■ | **C** | ■ |
+  |   | ■ |   |
+
 
 ## SIR
 
@@ -100,9 +199,9 @@ Nel caso base (senza immunità permanente), le regole che governano l'evoluzione
 $$
 \sigma_{ij}(t+1) =
 \begin{cases}
-\sigma_{ij}(t) + 1, & \text{se } 0 < \sigma_{ij}(t) < t_i + t_p + t_l, \\[4pt]
-0, & \text{se } \sigma_{ij}(t) = t_i + t_p + t_l, \\[4pt]
-0, & \text{se } \sigma_{ij}(t) = 0 \ \text{ e } \ u_{ij}(t+1) < h, \\[4pt]
+\sigma_{ij}(t) + 1, & \text{se } 0 < \sigma_{ij}(t) < t_i + t_p + t_l, $$4pt]
+0, & \text{se } \sigma_{ij}(t) = t_i + t_p + t_l, $$4pt]
+0, & \text{se } \sigma_{ij}(t) = 0 \ \text{ e } \ u_{ij}(t+1) < h, $$4pt]
 1, & \text{se } \sigma_{ij}(t) = 0 \ \text{ e } \ u_{ij}(t+1) \ge h,
 \end{cases}
 $$
@@ -137,7 +236,7 @@ Il contributo infettivo di ciascuna cella è a sua volta determinato dalla funzi
 $$
 I_{ij}(t+1) =
 \begin{cases}
-F\!\left(\sigma_{ij}(t)\right), & \text{se } \sigma_{ij}(t) \ge 1, \\[4pt]
+F\!\left(\sigma_{ij}(t)\right), & \text{se } \sigma_{ij}(t) \ge 1, $$4pt]
 0, & \text{se } \sigma_{ij}(t) \le 0,
 \end{cases}
 $$
@@ -147,8 +246,8 @@ dove $F(t): (0,\, t_i + t_p + t_l) \to \mathbb{R}^+$ è una funzione reale posit
 $$
 F\!\left(\sigma_{ij}(t)\right) =
 \begin{cases}
-f_i, & \text{se } 0 < \sigma_{ij}(t) \le t_i \quad \text{(incubazione)}, \\[4pt]
-f_p, & \text{se } t_i < \sigma_{ij}(t) \le t_i + t_p \quad \text{(infezione propria)}, \\[4pt]
+f_i, & \text{se } 0 < \sigma_{ij}(t) \le t_i \quad \text{(incubazione)}, $$4pt]
+f_p, & \text{se } t_i < \sigma_{ij}(t) \le t_i + t_p \quad \text{(infezione propria)}, $$4pt]
 f_l, & \text{se } t_i + t_p < \sigma_{ij}(t) \le t_i + t_p + t_l \quad \text{(latenza)}.
 \end{cases}
 $$
@@ -162,11 +261,11 @@ Il modello incorpora in modo unificato le diverse tipologie epidemiche tramite u
 $$
 \sigma_{ij}(t+1) =
 \begin{cases}
-\sigma_{ij}(t) + 1, & \text{se } 0 < \sigma_{ij}(t) < t_i + t_p + t_l, \\[4pt]
--1, & \text{se } \sigma_{ij}(t) = t_i + t_p + t_l, \\[4pt]
-\sigma_{ij}(t) - 1, & \text{se } -t_r \le \sigma_{ij}(t) < 0, \\[4pt]
-0, & \text{se } \sigma_{ij}(t) < -t_r, \\[4pt]
-0, & \text{se } \sigma_{ij}(t) = 0 \ \text{ e } \ u_{ij}(t+1) < h, \\[4pt]
+\sigma_{ij}(t) + 1, & \text{se } 0 < \sigma_{ij}(t) < t_i + t_p + t_l, $$4pt]
+-1, & \text{se } \sigma_{ij}(t) = t_i + t_p + t_l, $$4pt]
+\sigma_{ij}(t) - 1, & \text{se } -t_r \le \sigma_{ij}(t) < 0, $$4pt]
+0, & \text{se } \sigma_{ij}(t) < -t_r, $$4pt]
+0, & \text{se } \sigma_{ij}(t) = 0 \ \text{ e } \ u_{ij}(t+1) < h, $$4pt]
 1, & \text{se } \sigma_{ij}(t) = 0 \ \text{ e } \ u_{ij}(t+1) \ge h.
 \end{cases}
 $$
