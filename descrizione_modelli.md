@@ -1,88 +1,21 @@
-# Descrizione dei modelli di automa cellulare
-
-Gli automi cellulari (CA) rappresentano una classe di modelli matematici discreti utilizzati per simulare sistemi complessi in cui il comportamento globale emerge da interazioni locali semplici. In questi modelli, variabili come lo spazio, il tempo e gli stati sono trattati in modo discreto, differenziandosi dai modelli basati su equazioni differenziali continue.
-
-Il concetto di automa cellulare è nato nei primi anni '50 dal lavoro di John von Neumann che era impegnato nella ricerca di un'organizzazione logica capace di creare delle strutture autoreplicanti. Studiò un modello cellulare, basato su una griglia fissa, per semplificare l'analisi logica e sfruttare il parallelismo computazionale. In questo spazio, von Neumann dimostrò che era possibile costruire automi capaci sia di computazione universale (come una macchina di Turing) sia di costruzione universale.
-
-Negli anni '70, il matematico John Conway rese celebre il campo con il "Game of Life", un automa bidimensionale con regole semplicissime capace di generare strutture emergenti complesse e Turing-complete. Successivamente, negli anni '80, Stephen Wolfram fornì una classificazione sistematica degli CA in quattro classi, basata sulla complessità del loro comportamento a lungo termine.
-
-<!-- volendo si può espandere con la classificazione di wolfram e le regole di GoL -->
-
-## Base teorica
-
-Un automa cellulare può essere definito formalmente come una quadrupla $A = (G, E, U, f)$:
-
-1.  **$G$ (Griglia) :** Uno spazio discreto, solitamente una griglia $d$-dimensionale composta da celle identiche.
-2.  **$E$ (Insieme degli stati):** Ogni cella può trovarsi in uno tra un numero finito di stati possibili.
-3.  **$U$ (Vicinato):** Per ogni cella, definisce l'insieme di celle vicine che influenzano il suo stato futuro.
-4.  **Regola di transizione locale ($f$):** Una funzione che determina lo stato di una cella al passo temporale successivo in base allo stato attuale della cella stessa e dei suoi vicini.
-
-L'evoluzione di un CA avviene su una base temporale discreta e sincrona, quindi tutte le celle aggiornano il proprio stato simultaneamente a ogni iterazione.
-
-Si indichi con $i$ una cella di un CA; lo stato della cella $i$ al tempo $t$ viene indicato con $\sigma_i(t)$. Possiamo quindi in generale definire la regola di update dello stato di una cella come:
-$$\sigma_i(t+1) = f(\{\sigma_j(t) \mid j \in U(i)\})$$
-dove $U(i)$ rappresenta il vicinato della cella $i$. 
-
-Questa struttura permette di modellare una vasta gamma di fenomeni, dalla propagazione di eccitazioni nei tessuti cardiaci alla fluidodinamica (tramite i metodi *Lattice Boltzmann*), fornendo uno strumento che cattura l'essenza della complessità naturale con una minima perdita di informazioni locali.
-
-In questa tesi, sono stati analizzati automi cellulari strutturati con $G = \Z^2$, la griglia quadrata in 2 dimensioni. Come vicinato sono stati utilizzati di raggio 1 di:
-
-- **Von Neumann**: consiste nelle celle distanti 1, nella distanza di manhattan, dalla cella interessata. Quindi nel caso di studio avremo 4 vicini per ogni cella.
-
-  |   |   |   |
-  |:-:|:-:|:-:|
-  |   | ■ |   |
-  | ■ | **C** | ■ |
-  |   | ■ |   |
-
-- **Moore**: consiste nelle celle distanti 1, nella distanza di Chebyshev, dalla cella interessata. Quindi nel caso di studio avremo 8 vicini per ogni cella.
-
-  |   |   |   |
-  |:-:|:-:|:-:|
-  | ■ | ■ | ■ |
-  | ■ | **C** | ■ |
-  | ■ | ■ | ■ |
-
-In questa tesi i modelli sono modellizati sia come finiti che come infiniti.
-Nei modelli finiti, il vicinato delle celle che stanno ai bordi e a gli angoli della griglia non comprendono soltanto le celle interne alla griglia. Ad esempio il vicinato di Moore della cella nell'angolo in basso a destra comprende soltanto le celle:
-
-|   |   |   |   |   |   |
-|:-:|:-:|:-:|:-:|:-:|:-:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-|   |   |   |   | ■ | ■ |
-|   |   |   |   | ■ | **C** |
-
-Nei modelli infiniti, siccome non possiamo simulare una struttura infinita per definizione di CA, viene approssimata l'infinitezza del modello definendo il vicinato come se la griglia vivesse in un toro. In questa maniera il vicinato della stessa cella dell'esempio precedente comprende anche le celle sui bordi opposti della griglia, incluse quelle negli angoli in alto a destra, in basso a sinistra e in alto a sinistra:
-
-|   |   |   |   |   |   |
-|-|-|:-:|:-:|:-:|:-:|
-| ■ |   |   |   | ■ | ■ |
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| ■ |   |   |   | ■ | ■ |
-| ■ |   |   |   | ■ | **C** |
-
-## Modelli studiati
-
-Data l'ampia gamma di problemi che posso essere studiati tramite gli Automi Cellulari, si è scelto di restingere il campo a tre modelli differenti per numero di stati e legge di aggiornamento.
-
-### Modello SIR per la propagazione di malattie
-
-### Modello di diffusione degli incendi
-
-### Modello di Ising per la magnetizzazione 
-
-## Implementazione
+# Implementazione
 
 Questo documento descrive i modelli di automa cellulare implementati nella cartella
 `CellularAutomata-SIR`. I tre modelli principali (SIR, incendio boschivo, Ising) hanno la
 logica di evoluzione scritta in C (cartella `C_file/`, compilata in librerie condivise) e
 vengono pilotati da Python tramite `ctypes`; la visualizzazione è fatta con `pygame`.
 
+## Sintesi generale: due famiglie di automi cellulari per fenomeni di propagazione spaziale
+
+I modelli SIR e i modelli di incendio, pur descrivendo fenomeni fisicamente diversi, condividono la stessa struttura logica di fondo: una grandezza binaria o continua che si propaga per contatto locale su un reticolo discreto, con una soglia (deterministica o probabilistica) che decide se la propagazione avviene o si arresta. In entrambe le famiglie di modelli si ritrova:
+
+- una nozione di *soglia critica di propagazione*, che nei modelli SIR prende la forma del numero di riproduzione di base ($R_0=\beta S(0)/\gamma$ nell'ODE, $X=vS_O^0/\varepsilon$ nel CA di White, del Rey e Sánchez [[3]](CA-doc/SIR/A%20Model%20Based%20on%20Cellular%20Automata%20to%20Simulate%20Epidemic%20Diseases.pdf), [[4]](CA-doc/SIR/Modeling%20epidemics%20using%20cellular%20automata.pdf)) e nei modelli di incendio quella del rapporto critico $f/p\to0$ dell'autorganizzazione critica, oppure della soglia di percolazione del combustibile;
+- una *funzione di contagio/ignizione locale*, sempre scomponibile in un fattore di suscettibilità della cella ricevente (frazione di suscettibili $S_{ij}$, o presenza di combustibile) moltiplicato per un termine legato ai vicini "infetti"/"in fiamme", a sua volta modulato da fattori ambientali locali (densità di popolazione e connessioni di trasporto per il SIR; vento, pendenza e vegetazione per il fuoco);
+- una tensione tra *modelli meccanicistici astratti*, nati per studiare un fenomeno critico in sé (i contatori di fase $t_i,t_p,t_l$ di Fuentes–Kuperman, la criticità autoorganizzata di Bak–Chen–Tang/Drossel–Schwabl) e *modelli ingegneristici via via più realistici*, calibrati o calibrabili su dati osservati (le frazioni $(S,I,R)$ di White, del Rey e Sánchez [[3]](CA-doc/SIR/A%20Model%20Based%20on%20Cellular%20Automata%20to%20Simulate%20Epidemic%20Diseases.pdf), [[4]](CA-doc/SIR/Modeling%20epidemics%20using%20cellular%20automata.pdf) con il fattore di connessione $c$, la propagazione moltiplicativa $p_{burn}$ di Alexandridis validata sull'incendio di Spetses).
+
+Per l'implementazione in codice, questa lettura comparativa suggerisce un parallelismo diretto: il modello SIR "a contatore" di Fuentes–Kuperman [[2]](CA-doc/SIR/Cellular-automata-and-epidemiological-mo_1999_Physica-A--Statistical-Mechani.pdf), con vicinato di von Neumann e propagazione probabilistica per singolo vicino (e la sua variante stocastica dovuta a Landguth [[6]](CA-doc/SIR/A%20Cellular%20Automata%20SIR%20Model%20for%20Landscape%20Epidemiology.pdf)), e il modello di incendio a vicinato di Moore con matrice di propagazione anisotropa modulata dal vento (Karafyllidis–Thanailakis, Hernández Encinas et al., Alexandridis et al.) rappresentano, per le rispettive famiglie, il punto di equilibrio più naturale tra semplicità della regola locale e fedeltà fisica — ed è su questi due schemi che si baserà la fase successiva di implementazione.
+
+---
 
 ## Architettura comune
 
@@ -290,3 +223,27 @@ Automa **eccitabile deterministico** in stile Greenberg–Hastings, derivato dal
 una cella a riposo si eccita se un vicino (Moore) è sul fronte d'onda, poi decade a passi
 di 1 fino a tornare a riposo; il valore massimo rilancia il ciclo. Genera fronti d'onda
 che si propagano sulla griglia. Stesso boundary non uniforme di `Model_SIR.py`.
+
+## Scelte di implementazione
+
+### Perché servono scelte implementative concrete
+
+La definizione formale di automa cellulare — la quadrupla $(C,Q,V,f)$ vista nell'introduzione — lascia aperti diversi gradi di libertà che i modelli teorici presentati nei capitoli precedenti non sempre fissano in modo univoco: la dimensione e la finitezza della griglia, il trattamento dei bordi, il raggio e la forma esatta del vicinato, la natura sincrona o asincrona dell'aggiornamento. Per passare dalla teoria al codice queste scelte vanno rese esplicite, in modo coerente per tutti e tre i modelli, cosicché il confronto fra di essi sia significativo.
+
+### Come si è proceduto
+
+In questa tesi i tre modelli (SIR, incendio boschivo, Ising) sono implementati su una griglia quadrata bidimensionale $G=\mathbb{Z}^2$, con vicinato di raggio 1 di tipo von Neumann (4 vicini, distanza di Manhattan) o Moore (8 vicini, distanza di Chebyshev) a seconda del modello. Per ciascun modello la griglia può essere trattata come *finita* — le celle di bordo e d'angolo hanno un vicinato incompleto, limitato alle sole celle interne alla griglia — oppure come *toroidale*, un'approssimazione pratica dell'infinitezza in cui il vicinato "avvolge" la griglia sui lati opposti, cosicché ogni cella (bordi e angoli inclusi) abbia sempre un vicinato completo.
+
+La logica di evoluzione dei tre modelli è scritta in C (compilata in librerie condivise) e pilotata da Python tramite `ctypes`, con visualizzazione in `pygame`. L'aggiornamento della griglia avviene per la maggior parte dei modelli con un doppio buffer: la regola legge dalla griglia al passo corrente e scrive su una griglia di appoggio, scambiate a fine passo, così da garantire un aggiornamento *sincrono* in cui il nuovo stato di ogni cella dipende solo dalla configurazione al passo precedente. Il generatore di numeri pseudocasuali usato per le componenti probabilistiche delle regole è un `xorshift32`.
+
+### Metodi scelti in questo lavoro
+
+**Modello SIR.** Lo stato di cella è un contatore intero: `0` indica un individuo suscettibile, i valori successivi la progressione attraverso l'infezione e poi la resistenza, fino a una soglia finale oltre la quale la cella torna suscettibile (variante SIRS) o resta immune per sempre (SIR puro). Il vicinato è di von Neumann su griglia toroidale; una cella suscettibile diventa infetta con una prova di contagio indipendente per ciascun vicino infetto, ciascuna con probabilità fissa. È, nella sostanza, una versione semplificata dell'idea di contatore di fase di Fuentes–Kuperman, qui applicata a un vicinato più ristretto e con propagazione probabilistica per singolo vicino anziché tramite un campo di vicinato aggregato.
+
+**Modello di incendio boschivo.** Lo stato di cella è discreto su quattro valori (vuoto, albero, albero in fiamme, albero bruciato), su vicinato di Moore e griglia toroidale. Un albero prende fuoco con una probabilità che dipende, per ciascun vicino in fiamme, dall'allineamento tra la sua direzione relativa e la direzione del vento (probabilità massima sottovento, pressoché nulla controvento); un albero in fiamme diventa bruciato al passo successivo, senza ricrescita. Lo schema riprende così, in forma discreta e probabilistica, l'idea di matrice di propagazione anisotropa modulata dal vento introdotta da Karafyllidis–Thanailakis e ripresa da Alexandridis et al., senza includere pendenza, tipo di vegetazione o spotting.
+
+**Modello di Ising.** Lo stato di cella è uno spin $\pm1$ su vicinato di von Neumann, con boundary selezionabile (periodico o aperto). A differenza degli altri due modelli, l'aggiornamento è *asincrono*: a ogni passo viene tentato il flip di una singola cella scelta a caso, accettato secondo il criterio di Metropolis (sempre se l'energia diminuisce, altrimenti con probabilità $e^{-\Delta E/T}$) — la stessa dinamica presa come termine di paragone classico nel capitolo precedente, piuttosto che una delle regole deterministiche a scacchiera (Q2R, demoni di Creutz) discusse in teoria. È una scelta implementativa consapevole: Metropolis è l'algoritmo di riferimento più semplice da realizzare correttamente ed è quello rispetto a cui gli altri schemi vengono giudicati.
+
+Accanto a queste tre implementazioni in C, sono stati realizzati anche due prototipi preliminari in solo Python/NumPy: una prima variante del modello SIR con vicinato di Moore e probabilità di contagio fissa, e un automa eccitabile deterministico in stile Greenberg–Hastings che genera fronti d'onda propagantisi sulla griglia — utili come banco di prova concettuale prima del passaggio all'implementazione in C.
+
+---
